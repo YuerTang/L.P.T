@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
+
 
 # -------------------------------
 # CrossAttentionTransformer
@@ -185,15 +187,6 @@ class SimpleLatentPipeline(nn.Module):
         
         return x_recon, y_pred
 
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-
-# Suppose you have your model as in the "no PosteriorNetwork" code
-# from the previous example:
-# SimpleLatentPipeline(x_dim, z_embed_dim, x_embed_dim=64)
 
 def train_example():
     x_dim = 10
