@@ -1,7 +1,8 @@
 import torch
 import torch.optim as optim
-from dataset import download_tinyshakespeare, load_tinyshakespeare
-from LTM import SimpleLatentPipeline
+import torch.nn.functional as F
+from src.dataset import download_tinyshakespeare, load_tinyshakespeare
+from src.LTM import SimpleLatentPipeline
 
 # Tokenize text data
 def build_vocab(text):
@@ -30,17 +31,18 @@ def train():
     lr = 1e-3
     n_epochs = 5
 
-    # Initialize model
-    model = SimpleLatentPipeline(vocab_size, z_dim)
+    # Initialize model and move to GPU
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SimpleLatentPipeline(vocab_size, z_dim).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     # Training loop
     for epoch in range(n_epochs):
         for i in range(0, len(x_data) - seq_len, batch_size):
             x_batch = [x_data[i:i+seq_len] for i in range(i, i+batch_size)]
-            x_batch = torch.stack(x_batch)  # (batch_size, seq_len)
+            x_batch = torch.stack(x_batch).to(device)  # Move to GPU
 
-            logits = model(x_batch)  # Predicted logits
+            logits = model(x_batch)
             loss = F.cross_entropy(logits.view(-1, vocab_size), x_batch.view(-1))
 
             optimizer.zero_grad()
@@ -48,6 +50,11 @@ def train():
             optimizer.step()
 
         print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+
+    # Save the trained model
+    model_save_path = "trained_model.pth"
+    torch.save(model.state_dict(), model_save_path)
+    print(f"✅ Model saved at {model_save_path}")
 
 if __name__ == "__main__":
     train()
