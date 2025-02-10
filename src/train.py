@@ -3,6 +3,15 @@ import torch.optim as optim
 import torch.nn.functional as F
 from src.dataset import download_tinyshakespeare, load_tinyshakespeare
 from src.LTM import SimpleLatentPipeline
+import sys
+import os
+
+# Get the root directory and add it to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Now you can safely import from src
+from src.dataset import download_tinyshakespeare, load_tinyshakespeare
+
 
 # Tokenize text data
 def build_vocab(text):
