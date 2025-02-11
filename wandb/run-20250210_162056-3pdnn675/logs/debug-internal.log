@@ -1,0 +1,17 @@
+{"time":"2025-02-10T16:20:57.081260285-08:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/home/yuer/L.P.T/Trial/Code/L.P.T/wandb/run-20250210_162056-3pdnn675/logs/debug-core.log"}
+{"time":"2025-02-10T16:20:57.183430273-08:00","level":"INFO","msg":"created new stream","id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.183450001-08:00","level":"INFO","msg":"stream: started","id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.183456461-08:00","level":"INFO","msg":"handler: started","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.183468736-08:00","level":"INFO","msg":"sender: started","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.183479719-08:00","level":"INFO","msg":"writer: Do: started","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.259380988-08:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-10T16:20:57.25940426-08:00","level":"ERROR","msg":"sender: upsertRun:","error":"failed to upsert bucket: returned error 404 Not Found: {\"errors\":[{\"message\":\"entity Yuer Tang not found during upsertBucket\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-10T16:20:57.278234995-08:00","level":"INFO","msg":"stream: closing","id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.278299028-08:00","level":"ERROR","msg":"sender: upsertConfig: RunRecord is nil"}
+{"time":"2025-02-10T16:20:57.385550463-08:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-10T16:20:57.385571862-08:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404 Not Found: {\"errors\":[{\"message\":\"entity Yuer Tang not found during createRunFiles\",\"path\":[\"createRunFiles\"]}],\"data\":{\"createRunFiles\":null}}"}
+{"time":"2025-02-10T16:20:57.385807872-08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-10T16:20:57.385825771-08:00","level":"INFO","msg":"handler: closed","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.385835831-08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.385846782-08:00","level":"INFO","msg":"sender: closed","stream_id":"3pdnn675"}
+{"time":"2025-02-10T16:20:57.385868395-08:00","level":"INFO","msg":"stream: closed","id":"3pdnn675"}

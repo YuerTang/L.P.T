@@ -29,7 +29,7 @@ class TinyShakespeareDataset(Dataset):
     
     def __init__(self, file_path, seq_length=100):
         self.text = load_tinyshakespeare(file_path)
-        self.vocab = sorted(set(self.text))  # Unique characters
+        self.vocab = sorted(set(self.text))  
         self.char_to_idx = {ch: i for i, ch in enumerate(self.vocab)}
         self.idx_to_char = {i: ch for i, ch in enumerate(self.vocab)}
         self.seq_length = seq_length

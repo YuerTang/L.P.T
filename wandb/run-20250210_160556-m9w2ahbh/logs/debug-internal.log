@@ -1,0 +1,17 @@
+{"time":"2025-02-10T16:05:56.541091658-08:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/home/yuer/L.P.T/Trial/Code/L.P.T/wandb/run-20250210_160556-m9w2ahbh/logs/debug-core.log"}
+{"time":"2025-02-10T16:05:56.643355605-08:00","level":"INFO","msg":"created new stream","id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.643374313-08:00","level":"INFO","msg":"stream: started","id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.643433392-08:00","level":"INFO","msg":"handler: started","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.643433243-08:00","level":"INFO","msg":"writer: Do: started","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.643466399-08:00","level":"INFO","msg":"sender: started","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.725654096-08:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-10T16:05:56.725689932-08:00","level":"ERROR","msg":"sender: upsertRun:","error":"failed to upsert bucket: returned error 404 Not Found: {\"errors\":[{\"message\":\"entity your-wandb-username not found during upsertBucket\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-10T16:05:56.746849929-08:00","level":"INFO","msg":"stream: closing","id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.746892291-08:00","level":"ERROR","msg":"sender: upsertConfig: RunRecord is nil"}
+{"time":"2025-02-10T16:05:56.85668991-08:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-10T16:05:56.856707315-08:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404 Not Found: {\"errors\":[{\"message\":\"entity your-wandb-username not found during createRunFiles\",\"path\":[\"createRunFiles\"]}],\"data\":{\"createRunFiles\":null}}"}
+{"time":"2025-02-10T16:05:56.857112573-08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-10T16:05:56.857130809-08:00","level":"INFO","msg":"handler: closed","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.857140024-08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.857144531-08:00","level":"INFO","msg":"sender: closed","stream_id":"m9w2ahbh"}
+{"time":"2025-02-10T16:05:56.857162991-08:00","level":"INFO","msg":"stream: closed","id":"m9w2ahbh"}

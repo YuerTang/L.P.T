@@ -41,7 +41,9 @@ class SimpleLatentPipeline(nn.Module):
 
             z_latent = z.unsqueeze(1)  # (batch, 1, z_dim)
             x_recon = self.px_model(z_latent)
-            recon_loss = F.cross_entropy(x_recon, x)  # Categorical loss
+            recon_loss = F.cross_entropy(x_recon.view(-1, x_recon.shape[-1]), x.view(-1)[: x_recon.shape[0]].long())
+
+
 
             recon_loss.backward()
             with torch.no_grad():

@@ -1,0 +1,24 @@
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_setup.py:_flush():68] Current SDK version is 0.19.6
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_setup.py:_flush():68] Configure stats pid to 210068
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_setup.py:_flush():68] Loading settings from /home/yuer/.config/wandb/settings
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_setup.py:_flush():68] Loading settings from /home/yuer/L.P.T/Trial/Code/L.P.T/wandb/settings
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_init.py:setup_run_log_directory():637] Logging user logs to /home/yuer/L.P.T/Trial/Code/L.P.T/wandb/run-20250210_162918-6rgqvt6m/logs/debug.log
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_init.py:setup_run_log_directory():638] Logging internal logs to /home/yuer/L.P.T/Trial/Code/L.P.T/wandb/run-20250210_162918-6rgqvt6m/logs/debug-internal.log
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_init.py:init():756] calling init triggers
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_init.py:init():761] wandb.init called with sweep_config: {}
+config: {'learning_rate': 0.001, 'batch_size': 32, 'epochs': 5, 'seq_len': 50, 'z_dim': 32, '_wandb': {}}
+2025-02-10 16:29:18,068 INFO    MainThread:210068 [wandb_init.py:init():789] starting backend
+2025-02-10 16:29:18,278 INFO    MainThread:210068 [wandb_init.py:init():793] sending inform_init request
+2025-02-10 16:29:18,287 INFO    MainThread:210068 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-02-10 16:29:18,287 INFO    MainThread:210068 [wandb_init.py:init():808] backend started and connected
+2025-02-10 16:29:18,289 INFO    MainThread:210068 [wandb_init.py:init():901] updated telemetry
+2025-02-10 16:29:18,298 INFO    MainThread:210068 [wandb_init.py:init():936] communicating run to backend with 90.0 second timeout
+2025-02-10 16:29:18,463 ERROR   MainThread:210068 [wandb_init.py:init():1481] error in wandb.init()
+Traceback (most recent call last):
+  File "/home/yuer/.local/lib/python3.8/site-packages/wandb/sdk/wandb_init.py", line 1471, in init
+    return wi.init(run_settings, run_config)
+  File "/home/yuer/.local/lib/python3.8/site-packages/wandb/sdk/wandb_init.py", line 967, in init
+    raise error
+wandb.errors.errors.CommError: failed to upsert bucket: returned error 404 Not Found: {"errors":[{"message":"entity yeurtang not found during upsertBucket","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2025-02-10 16:29:18,484 WARNING MsgRouterThr:210068 [router.py:message_loop():75] message_loop has been closed

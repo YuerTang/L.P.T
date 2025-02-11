@@ -5,13 +5,14 @@ from src.dataset import download_tinyshakespeare, load_tinyshakespeare
 from src.LTM import SimpleLatentPipeline
 import sys
 import os
+import wandb
+
 
 # Get the root directory and add it to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Now you can safely import from src
 from src.dataset import download_tinyshakespeare, load_tinyshakespeare
-
 
 # Tokenize text data
 def build_vocab(text):
@@ -24,6 +25,7 @@ def encode_text(text, char2idx):
     return torch.tensor([char2idx[c] for c in text], dtype=torch.long)
 
 def train():
+
     # Load dataset
     file_path = download_tinyshakespeare()
     text = load_tinyshakespeare(file_path)
@@ -40,6 +42,17 @@ def train():
     lr = 1e-3
     n_epochs = 5
 
+    wandb.init(
+    project="LTM",  # Change this to your project name
+    entity="yeurtang",  # Replace with your WandB username
+    config={
+        "learning_rate": lr,
+        "batch_size": batch_size,
+        "epochs": n_epochs,
+        "seq_len": seq_len,
+        "z_dim": z_dim,
+    },
+)
     # Initialize model and move to GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = SimpleLatentPipeline(vocab_size, z_dim).to(device)
@@ -47,22 +60,31 @@ def train():
 
     # Training loop
     for epoch in range(n_epochs):
-        for i in range(0, len(x_data) - seq_len, batch_size):
-            x_batch = [x_data[i:i+seq_len] for i in range(i, i+batch_size)]
-            x_batch = torch.stack(x_batch).to(device)  # Move to GPU
+        epoch_loss = 0
+        num_batches = 0
 
-            logits = model(x_batch)
-            loss = F.cross_entropy(logits.view(-1, vocab_size), x_batch.view(-1))
+    for i in range(0, len(x_data) - seq_len, batch_size):
+        x_batch = [x_data[i:i+seq_len] for i in range(i, min(i+batch_size, len(x_data) - seq_len))]
+        x_batch = [torch.tensor(seq, dtype=torch.long) for seq in x_batch]
+        x_batch = torch.nn.utils.rnn.pad_sequence(x_batch, batch_first=True, padding_value=0).to(device)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+        logits = model(x_batch)
+        loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), x_batch.view(-1).long()[: logits.shape[0]])
 
-        print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-    # Save the trained model
+        epoch_loss += loss.item()
+        num_batches += 1
+
+    avg_loss = epoch_loss / num_batches
+    wandb.log({"epoch": epoch+1, "loss": avg_loss})  # Log loss to WandB
+    print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+
     model_save_path = "trained_model.pth"
     torch.save(model.state_dict(), model_save_path)
+    wandb.save(model_save_path)  # Upload to WandB
     print(f"✅ Model saved at {model_save_path}")
 
 if __name__ == "__main__":
