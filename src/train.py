@@ -1,3 +1,4 @@
+import time
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -43,16 +44,18 @@ def train():
     n_epochs = 5
 
     wandb.init(
-    project="LTM",  # Change this to your project name
-    entity="yeurtang",  # Replace with your WandB username
-    config={
-        "learning_rate": lr,
-        "batch_size": batch_size,
-        "epochs": n_epochs,
-        "seq_len": seq_len,
-        "z_dim": z_dim,
-    },
-)
+        project="LTM", 
+        entity="yuertang",
+        name=f"training_run_{int(time.time())}",  # Generates unique run names
+        config={
+            "learning_rate": lr,
+            "batch_size": batch_size,
+            "epochs": n_epochs,
+            "seq_len": seq_len,
+            "z_dim": z_dim,
+        },
+    )
+
     # Initialize model and move to GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = SimpleLatentPipeline(vocab_size, z_dim).to(device)
@@ -63,24 +66,25 @@ def train():
         epoch_loss = 0
         num_batches = 0
 
-    for i in range(0, len(x_data) - seq_len, batch_size):
-        x_batch = [x_data[i:i+seq_len] for i in range(i, min(i+batch_size, len(x_data) - seq_len))]
-        x_batch = [torch.tensor(seq, dtype=torch.long) for seq in x_batch]
-        x_batch = torch.nn.utils.rnn.pad_sequence(x_batch, batch_first=True, padding_value=0).to(device)
+        for i in range(0, len(x_data) - seq_len, batch_size):
+            x_batch = [x_data[i:i+seq_len] for i in range(i, min(i+batch_size, len(x_data) - seq_len))]
+            x_batch = [torch.tensor(seq, dtype=torch.long) for seq in x_batch]
+            x_batch = torch.nn.utils.rnn.pad_sequence(x_batch, batch_first=True, padding_value=0).to(device)
 
-        logits = model(x_batch)
-        loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), x_batch.view(-1).long()[: logits.shape[0]])
+            logits = model(x_batch)
+            loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), x_batch.view(-1), ignore_index=0)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        epoch_loss += loss.item()
-        num_batches += 1
+            epoch_loss += loss.item()
+            num_batches += 1
 
-    avg_loss = epoch_loss / num_batches
-    wandb.log({"epoch": epoch+1, "loss": avg_loss})  # Log loss to WandB
-    print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+        avg_loss = epoch_loss / num_batches
+        print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+        wandb.log({"epoch": epoch+1, "loss": avg_loss, "step": epoch+1})
+
 
     model_save_path = "trained_model.pth"
     torch.save(model.state_dict(), model_save_path)
