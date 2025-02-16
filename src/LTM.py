@@ -15,10 +15,12 @@ class P_XGivenZ_Model(nn.Module):
         )
 
     def forward(self, z_latent):
-        batch_size, seq_len_z, embed_dim = z_latent.shape
-        z_flat = z_latent.view(batch_size, seq_len_z * embed_dim)
-        logits = self.fc(z_flat)  # (batch, vocab_size)
-        return logits  # Logits for character prediction
+        batch_size, seq_len_z, embed_dim = z_latent.shape  # Extract sequence length
+        z_flat = z_latent.reshape(batch_size * seq_len_z, embed_dim)  # ✅ This works
+        logits = self.fc(z_flat)  # (batch_size * seq_len_z, vocab_size)
+        logits = logits.view(batch_size, seq_len_z, -1)  # Reshape back to (batch, seq_len, vocab_size)
+        return logits
+
 
 class SimpleLatentPipeline(nn.Module):
     """
@@ -55,6 +57,7 @@ class SimpleLatentPipeline(nn.Module):
 
     def forward(self, x):
         z = self.sample_z_langevin(x)
-        z_latent = z.unsqueeze(1)
+        z_latent = z.unsqueeze(1).expand(-1, x.shape[1], -1)  # Expand to match seq_len
         logits = self.px_model(z_latent)
         return logits
+

@@ -12,9 +12,6 @@ import wandb
 # Get the root directory and add it to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Now you can safely import from src
-from src.dataset import download_tinyshakespeare, load_tinyshakespeare
-
 # Tokenize text data
 def build_vocab(text):
     vocab = sorted(set(text))
@@ -68,11 +65,16 @@ def train():
 
         for i in range(0, len(x_data) - seq_len, batch_size):
             x_batch = [x_data[i:i+seq_len] for i in range(i, min(i+batch_size, len(x_data) - seq_len))]
-            x_batch = [torch.tensor(seq, dtype=torch.long) for seq in x_batch]
+            x_batch = [torch.clone(seq).detach().to(torch.long) for seq in x_batch]
             x_batch = torch.nn.utils.rnn.pad_sequence(x_batch, batch_first=True, padding_value=0).to(device)
 
             logits = model(x_batch)
+            print(f"Fixed logits shape: {logits.shape}")
+            print(f"x_batch shape: {x_batch.shape}")
+
             loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), x_batch.view(-1), ignore_index=0)
+
+
 
             optimizer.zero_grad()
             loss.backward()
@@ -83,13 +85,13 @@ def train():
 
         avg_loss = epoch_loss / num_batches
         print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
-        wandb.log({"epoch": epoch+1, "loss": avg_loss, "step": epoch+1})
+        wandb.log({ "loss": epoch_loss,"epoch": epoch+1})
 
 
     model_save_path = "trained_model.pth"
     torch.save(model.state_dict(), model_save_path)
     wandb.save(model_save_path)  # Upload to WandB
-    print(f"✅ Model saved at {model_save_path}")
+    print(f"Model saved at {model_save_path}")
 
 if __name__ == "__main__":
     train()
