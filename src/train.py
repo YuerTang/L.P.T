@@ -2,8 +2,8 @@ import time
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
-from src.dataset import download_tinyshakespeare, load_tinyshakespeare
-from src.LTM import SimpleLatentPipeline
+from dataset import download_tinyshakespeare, load_tinyshakespeare
+from LTM import SimpleLatentPipeline
 import sys
 import os
 import wandb
