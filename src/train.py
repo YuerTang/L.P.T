@@ -2,7 +2,7 @@ import time
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
-from dataset import download_tinyshakespeare, load_tinyshakespeare
+from dataset import load_tinyshakespeare
 from LTM import SimpleLatentPipeline
 import sys
 import os
@@ -28,7 +28,7 @@ def encode_text(text, char2idx):
 def train():
 
     # Load dataset
-    file_path = download_tinyshakespeare()
+    file_path = "data/input.txt" 
     text = load_tinyshakespeare(file_path)
     
     # Tokenization
