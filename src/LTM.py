@@ -9,10 +9,13 @@ class P_XGivenZ_Model(nn.Module):
     def __init__(self, z_embed_dim, vocab_size):
         super().__init__()
         self.fc = nn.Sequential(
-            nn.Linear(z_embed_dim, 128),
+            nn.Linear(z_embed_dim, 256),  # Increased hidden dimension
             nn.ReLU(),
-            nn.Linear(128, vocab_size)  # Output probabilities over vocabulary
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, vocab_size)  # Final output
         )
+
 
     def forward(self, z_latent):
         batch_size, seq_len_z, embed_dim = z_latent.shape  # Extract sequence length
@@ -44,9 +47,6 @@ class SimpleLatentPipeline(nn.Module):
             z_latent = z.unsqueeze(1)  # (batch, 1, z_dim)
             x_recon = self.px_model(z_latent)
             recon_loss = F.cross_entropy(x_recon.view(-1, x_recon.shape[-1]), x.view(-1)[: x_recon.shape[0]].long())
-
-
-
             recon_loss.backward()
             with torch.no_grad():
                 z = z - 0.5 * step_size * z.grad

@@ -12,6 +12,7 @@ import wandb
 # Get the root directory and add it to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+
 # Tokenize text data
 def build_vocab(text):
     vocab = sorted(set(text))
@@ -37,7 +38,7 @@ def train():
     z_dim = 32
     batch_size = 32
     seq_len = 50  # Use small sequences for training
-    lr = 1e-3
+    lr = 1e-4
     n_epochs = 5
 
     wandb.init(
@@ -69,12 +70,7 @@ def train():
             x_batch = torch.nn.utils.rnn.pad_sequence(x_batch, batch_first=True, padding_value=0).to(device)
 
             logits = model(x_batch)
-            print(f"Fixed logits shape: {logits.shape}")
-            print(f"x_batch shape: {x_batch.shape}")
-
             loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), x_batch.view(-1), ignore_index=0)
-
-
 
             optimizer.zero_grad()
             loss.backward()
@@ -85,7 +81,7 @@ def train():
 
         avg_loss = epoch_loss / num_batches
         print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
-        wandb.log({ "loss": epoch_loss,"epoch": epoch+1})
+        wandb.log({ "loss": avg_loss, "epoch": epoch+1 })
 
 
     model_save_path = "trained_model.pth"
@@ -95,3 +91,4 @@ def train():
 
 if __name__ == "__main__":
     train()
+ 

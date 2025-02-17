@@ -3,3 +3,7 @@
 
 # Ignore wandb runs
 wandb/
+
+*.pyc
+
+*.pth
