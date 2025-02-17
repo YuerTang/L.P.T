@@ -3,7 +3,7 @@ import torch
 import torch.optim as optim
 import torch.nn.functional as F
 from dataset import load_tinyshakespeare
-from LTM import SimpleLatentPipeline
+from LTM_paper import SimpleLatentPipeline
 import sys
 import os
 import wandb
