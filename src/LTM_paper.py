@@ -19,25 +19,19 @@ class P_XGivenZ_Model(nn.Module):
     def forward(self, x_tokens, z_latent):
         batch_size, seq_len = x_tokens.shape
 
-        # ✅ Fix: Replace one-hot encoding with an embedding lookup
         x_emb = self.token_embedding(x_tokens)  # (batch, seq_len, hidden_dim)
 
-        # ✅ Project z_latent and expand for cross-attention
         z_latent = self.z_projection(z_latent)  # (batch, hidden_dim)
         z_latent = z_latent.unsqueeze(1).repeat(1, seq_len, 1)  # (batch, seq_len, hidden_dim)
 
-        # ✅ Create causal mask for autoregressive decoding
         causal_mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1).to(x_tokens.device)
         causal_mask = causal_mask.masked_fill(causal_mask == 1, float('-inf'))
 
-        # ✅ Transformer Decoder Forward Pass
         decoder_output = self.transformer_decoder(
             tgt=x_emb.permute(1, 0, 2),  # (seq_len, batch, hidden_dim)
             memory=z_latent.permute(1, 0, 2),  # (seq_len, batch, hidden_dim)
             tgt_mask=causal_mask
         )
-
-        # ✅ Project decoder output to vocab logits
         logits = self.output_layer(decoder_output.permute(1, 0, 2))  # (batch, seq_len, vocab_size)
         return logits
 
