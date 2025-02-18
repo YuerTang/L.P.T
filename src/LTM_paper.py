@@ -79,3 +79,6 @@ class SimpleLatentPipeline(nn.Module):
         x = x.long()
         logits = self.px_model(x, z)
         return logits
+
+  
+

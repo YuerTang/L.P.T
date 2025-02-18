@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import wandb
 import sys
 
+
 def train(model, device, train_dataloader, val_dataloader, config):
     optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
     best_loss = float("inf")
@@ -90,3 +91,5 @@ def eval(model, device, val_dataloader, log_wandb=False):
         wandb.log({"val_loss": avg_loss})
 
     return avg_loss
+
+

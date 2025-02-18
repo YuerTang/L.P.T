@@ -53,39 +53,41 @@ logging.info(f"Validation DataLoader initialized with batch size {batch_size}")
 logging.info(f"Test DataLoader initialized with batch size {batch_size}")
 
 
-z_dim = 32
-model = SimpleLatentPipeline(vocab_size=len(full_dataset.vocab), z_embed_dim=z_dim).to(device)
+z_embed_dim_values = [32, 64, 128, 256]
+for z_dim in z_embed_dim_values:
+    logging.info(f"Initializing model with z_dim: {z_dim}...")
+    model = SimpleLatentPipeline(vocab_size=len(full_dataset.vocab), z_embed_dim=z_dim).to(device)
 
-logging.info(f"Model initialized with z_dim: {z_dim} and vocab size: {len(full_dataset.vocab)}")
+    logging.info(f"Model initialized with z_dim: {z_dim} and vocab size: {len(full_dataset.vocab)}")
 
 
-config = {
-    "learning_rate": 1e-3,
-    "epochs": 2,
-    "batch_size": batch_size
-}
+    config = {
+        "learning_rate": 1e-3,
+        "epochs": 2,
+        "batch_size": batch_size
+    }
 
-logging.info(f"Training Configuration: {config}")
+    logging.info(f"Training Configuration: {config}")
 
-logging.info("Starting training process...")
-best_model_state_dict = train(
-    model=model,
-    device=device,
-    train_dataloader=train_dataloader,
-    val_dataloader=val_dataloader,
-    config=config
-)
+    logging.info("Starting training process...")
+    best_model_state_dict = train(
+        model=model,
+        device=device,
+        train_dataloader=train_dataloader,
+        val_dataloader=val_dataloader,
+        config=config
+    )
 
-best_model_path = "best_model.pth"
-torch.save(best_model_state_dict, best_model_path)
-logging.info(f"Best model saved at {best_model_path}")
+    best_model_path = "best_model.pth"
+    torch.save(best_model_state_dict, best_model_path)
+    logging.info(f"Best model saved at {best_model_path}")
 
-logging.info("Loading best model for evaluation...")
-model.load_state_dict(torch.load(best_model_path))
-model.to(device)
+    logging.info("Loading best model for evaluation...")
+    model.load_state_dict(torch.load(best_model_path))
+    model.to(device)
 
-logging.info("Starting evaluation on test set...")
-test_loss = eval(model=model, device=device, val_dataloader=test_dataloader)
+    logging.info("Starting evaluation on test set...")
+    test_loss = eval(model=model, device=device, val_dataloader=test_dataloader)
 
-logging.info(f"✅ Final Test Loss: {test_loss:.4f}")
+    logging.info(f"✅ Final Test Loss: {test_loss:.4f}")
 logging.info("🎉 All processes complete. Exiting.")
