@@ -2,8 +2,6 @@ import os
 import torch
 from torch.utils.data import Dataset
 
-
-
 def load_tinyshakespeare(file_path):
     """Loads text data from TinyShakespeare dataset."""
     with open(file_path, "r", encoding="utf-8") as f:

@@ -1,59 +1,63 @@
 import torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, random_split
 import wandb
-from train import train, eval
-from LTM_paper import SimpleLatentPipeline
-from dataset import load_tinyshakespeare
+from train_paper import train, eval
+from LTM_paper import SimpleLatentPipeline  
+from dataset import TinyShakespeareDataset 
 
-# ✅ Initialize WandB
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 wandb.init(project="LTM", entity="yuertang", name="train_eval_run")
 
-# ✅ Device setup
 device = "cuda" if torch.cuda.is_available() else "cpu"
+logging.info(f"Using device: {device}")
 
-# ✅ Load dataset
 file_path = "data/input.txt"
-text = load_tinyshakespeare(file_path)
-
-# ✅ Tokenization
-def build_vocab(text):
-    vocab = sorted(set(text))
-    char2idx = {ch: idx for idx, ch in enumerate(vocab)}
-    return vocab, char2idx
-
-def encode_text(text, char2idx):
-    return torch.tensor([char2idx[c] for c in text], dtype=torch.long)
-
-vocab, char2idx = build_vocab(text)
-encoded_text = encode_text(text, char2idx)
-vocab_size = len(vocab)
-
-# ✅ Create data for training, validation, and testing
 seq_len = 50
-batch_size = 32
+batch_size = 8
 
-def create_dataloader(data, seq_len, batch_size):
-    sequences = [data[i:i + seq_len + 1] for i in range(len(data) - seq_len)]
-    dataset = TensorDataset(torch.stack(sequences))  # Convert to PyTorch dataset
-    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
+logging.info("Loading TinyShakespeare dataset...")
+full_dataset = TinyShakespeareDataset(file_path, seq_length=seq_len)
 
-train_dataloader = create_dataloader(encoded_text[:8000], seq_len, batch_size)
-val_dataloader = create_dataloader(encoded_text[8000:9000], seq_len, batch_size)
-test_dataloader = create_dataloader(encoded_text[9000:10000], seq_len, batch_size)
+total_samples = len(full_dataset)
+train_size = int(0.8 * total_samples)  
+val_size = int(0.1 * total_samples)
+test_size = total_samples - train_size - val_size  # Remaining 10%
 
-# ✅ Initialize model
+logging.info(f"Dataset size: {total_samples} samples")
+logging.info(f"Splitting dataset -> Train: {train_size}, Validation: {val_size}, Test: {test_size}")
+
+train_dataset, val_dataset, test_dataset = random_split(
+    full_dataset, [train_size, val_size, test_size]
+)
+
+train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+logging.info(f"Train DataLoader initialized with batch size {batch_size}")
+logging.info(f"Validation DataLoader initialized with batch size {batch_size}")
+logging.info(f"Test DataLoader initialized with batch size {batch_size}")
+
+
 z_dim = 32
-model = SimpleLatentPipeline(vocab_size, z_dim).to(device)
+model = SimpleLatentPipeline(vocab_size=len(full_dataset.vocab), z_embed_dim=z_dim).to(device)
 
-# ✅ Training configuration
+logging.info(f"Model initialized with z_dim: {z_dim} and vocab size: {len(full_dataset.vocab)}")
+
+
 config = {
     "learning_rate": 1e-4,
     "epochs": 5,
     "batch_size": batch_size
 }
 
-# ✅ Train model (save best weights)
-best_model = train(
+logging.info(f"Training Configuration: {config}")
+
+logging.info("Starting training process...")
+best_model_state_dict = train(
     model=model,
     device=device,
     train_dataloader=train_dataloader,
@@ -61,6 +65,16 @@ best_model = train(
     config=config
 )
 
-# ✅ Load best model and evaluate on test set
-model.load_state_dict(torch.load("best_model.pth"))
-eval(model=model, device=device, val_dataloader=test_dataloader)
+best_model_path = "best_model.pth"
+torch.save(best_model_state_dict, best_model_path)
+logging.info(f"Best model saved at {best_model_path}")
+
+logging.info("Loading best model for evaluation...")
+model.load_state_dict(torch.load(best_model_path))
+model.to(device)
+
+logging.info("Starting evaluation on test set...")
+test_loss = eval(model=model, device=device, val_dataloader=test_dataloader)
+
+logging.info(f"✅ Final Test Loss: {test_loss:.4f}")
+logging.info("🎉 All processes complete. Exiting.")
