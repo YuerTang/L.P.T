@@ -62,7 +62,10 @@ class SimpleLatentPipeline(nn.Module):
 
             x_recon = self.px_model(x, z)  # Forward pass
             recon_loss = F.cross_entropy(x_recon.reshape(-1, x_recon.shape[-1]), x.reshape(-1).long())
+
+
             recon_loss.backward()
+
 
             with torch.no_grad():
                 z = z - 0.5 * step_size * z.grad

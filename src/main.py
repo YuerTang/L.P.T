@@ -20,18 +20,29 @@ batch_size = 8
 
 logging.info("Loading TinyShakespeare dataset...")
 full_dataset = TinyShakespeareDataset(file_path, seq_length=seq_len)
+tiny_subset_size = int(0.1 * len(full_dataset))
+small_dataset, _ = random_split(full_dataset, [tiny_subset_size, len(full_dataset) - tiny_subset_size])
 
-total_samples = len(full_dataset)
-train_size = int(0.8 * total_samples)  
-val_size = int(0.1 * total_samples)
-test_size = total_samples - train_size - val_size  # Remaining 10%
-
-logging.info(f"Dataset size: {total_samples} samples")
-logging.info(f"Splitting dataset -> Train: {train_size}, Validation: {val_size}, Test: {test_size}")
+# ✅ Split into train, val, and test
+train_size = int(0.8 * tiny_subset_size)
+val_size = int(0.1 * tiny_subset_size)
+test_size = tiny_subset_size - train_size - val_size
 
 train_dataset, val_dataset, test_dataset = random_split(
-    full_dataset, [train_size, val_size, test_size]
+    small_dataset, [train_size, val_size, test_size]
 )
+
+# total_samples = len(full_dataset)
+# train_size = int(0.8 * total_samples)  
+# val_size = int(0.1 * total_samples)
+# test_size = total_samples - train_size - val_size  # Remaining 10%
+
+# logging.info(f"Dataset size: {total_samples} samples")
+# logging.info(f"Splitting dataset -> Train: {train_size}, Validation: {val_size}, Test: {test_size}")
+
+# train_dataset, val_dataset, test_dataset = random_split(
+#     full_dataset, [train_size, val_size, test_size]
+# )
 
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -49,8 +60,8 @@ logging.info(f"Model initialized with z_dim: {z_dim} and vocab size: {len(full_d
 
 
 config = {
-    "learning_rate": 1e-4,
-    "epochs": 5,
+    "learning_rate": 1e-3,
+    "epochs": 2,
     "batch_size": batch_size
 }
 

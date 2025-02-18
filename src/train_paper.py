@@ -62,29 +62,31 @@ def train(model, device, train_dataloader, val_dataloader, config):
     return best_model  
 
 def eval(model, device, val_dataloader, log_wandb=False):
-    model.eval()
+    model.eval()  # ✅ Set model to evaluation mode
+
     total_loss = 0
     num_batches = 0
 
-    with torch.no_grad():
-        for batch_idx, (x_batch, y_batch) in enumerate(val_dataloader):
-            print(f"🔍 Evaluating Batch {batch_idx+1}/{len(val_dataloader)}")
-            sys.stdout.flush()
-
+    with torch.enable_grad():  # ✅ Allow gradients even in eval mode
+        for x_batch, y_batch in val_dataloader:
             x_batch = x_batch.to(device)
             y_batch = y_batch.to(device)
 
             logits = model(x_batch)
+
+            # Ensure `z` is created with gradients enabled
+            if hasattr(model, "z_embed_dim"):  
+                z = torch.randn(x_batch.shape[0], model.z_embed_dim, device=device, requires_grad=True)  # ✅ Ensure requires_grad=True
+
             loss = F.cross_entropy(logits.reshape(-1, logits.shape[-1]), y_batch.reshape(-1), ignore_index=-100)
 
             total_loss += loss.item()
             num_batches += 1
 
     avg_loss = total_loss / num_batches
-    print(f"📊 Validation Loss: {avg_loss:.4f}")
-    sys.stdout.flush()
+    print(f"Validation Loss: {avg_loss:.4f}")
 
     if log_wandb:
         wandb.log({"val_loss": avg_loss})
 
-    return avg_loss  
+    return avg_loss
