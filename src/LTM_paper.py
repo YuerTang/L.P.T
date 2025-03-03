@@ -6,22 +6,18 @@ class P_XGivenZ_Model(nn.Module):
     def __init__(self, z_embed_dim, vocab_size, hidden_dim=256, num_heads=8):
         super().__init__()
 
-        self.token_embedding = nn.Embedding(vocab_size, hidden_dim)  # ✅ Fix: Use an embedding layer
-        self.z_projection = nn.Linear(z_embed_dim, hidden_dim)  # ✅ Project latent thought vector to match hidden dim
+        self.token_embedding = nn.Embedding(vocab_size, hidden_dim)  
+        self.z_projection = nn.Linear(z_embed_dim, hidden_dim)  
 
         decoder_layer = nn.TransformerDecoderLayer(
             d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim * 4, dropout=0.1, activation="relu"
         )
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=1)
 
-        self.output_layer = nn.Linear(hidden_dim, vocab_size)  # ✅ Maps hidden state back to vocabulary logits
+        self.output_layer = nn.Linear(hidden_dim, vocab_size)  
 
     def forward(self, x_tokens, z_latent): 
-        
-
         batch_size, seq_len = x_tokens.shape  
-
-
         x_emb = self.token_embedding(x_tokens)  # (batch, seq_len, hidden_dim)
 
         z_latent = self.z_projection(z_latent)  # (batch, hidden_dim)
