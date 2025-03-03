@@ -32,18 +32,6 @@ train_dataset, val_dataset, test_dataset = random_split(
     small_dataset, [train_size, val_size, test_size]
 )
 
-# total_samples = len(full_dataset)
-# train_size = int(0.8 * total_samples)  
-# val_size = int(0.1 * total_samples)
-# test_size = total_samples - train_size - val_size  # Remaining 10%
-
-# logging.info(f"Dataset size: {total_samples} samples")
-# logging.info(f"Splitting dataset -> Train: {train_size}, Validation: {val_size}, Test: {test_size}")
-
-# train_dataset, val_dataset, test_dataset = random_split(
-#     full_dataset, [train_size, val_size, test_size]
-# )
-
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -57,7 +45,7 @@ z_embed_dim_values = [32, 64, 128, 256]
 for z_dim in z_embed_dim_values:
     logging.info(f"Initializing model with z_dim: {z_dim}...")
     model = SimpleLatentPipeline(vocab_size=len(full_dataset.vocab), z_embed_dim=z_dim).to(device)
-
+    print(model)
     logging.info(f"Model initialized with z_dim: {z_dim} and vocab size: {len(full_dataset.vocab)}")
 
 
@@ -81,7 +69,11 @@ for z_dim in z_embed_dim_values:
     best_model_path = "best_model.pth"
     torch.save(best_model_state_dict, best_model_path)
     logging.info(f"Best model saved at {best_model_path}")
+    from torchinfo import summary
 
+    summary(model, input_size=(batch_size, seq_len))  # adjust as needed
+    latent_model_params = sum(p.numel() for p in latent_model.parameters())
+    print(f"Latent model has {latent_model_params} parameters.")
     logging.info("Loading best model for evaluation...")
     model.load_state_dict(torch.load(best_model_path))
     model.to(device)

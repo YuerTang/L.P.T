@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class P_XGivenZ_Model(nn.Module):
     def __init__(self, z_embed_dim, vocab_size, hidden_dim=256, num_heads=8):
         super().__init__()
@@ -12,7 +13,7 @@ class P_XGivenZ_Model(nn.Module):
         decoder_layer = nn.TransformerDecoderLayer(
             d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim * 4, dropout=0.1, activation="relu"
         )
-        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=1)
+        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=4)
 
         self.output_layer = nn.Linear(hidden_dim, vocab_size)  
 
@@ -75,6 +76,7 @@ class SimpleLatentPipeline(nn.Module):
         x = x.long()
         logits = self.px_model(x, z)
         return logits
+
 
   
 
